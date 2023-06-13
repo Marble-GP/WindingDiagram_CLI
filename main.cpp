@@ -93,10 +93,16 @@ void OnKeyUp(unsigned char key, int x, int y)
 
 int main(int argc, char* argv[])
 {
-
 	char file_line_buf[FILE_LINE_BUF_SIZE] = {};
-	std::cout << "Enter winding diagram configure json file:";
-	std::cin >> file_name;
+	if (argc == 1)
+	{
+		std::cout << "Enter winding diagram configure json file:";
+		std::cin >> file_name;
+	}
+	else if (argc == 2)
+	{
+		file_name = argv[1];
+	}
 
 	p_code = new json();
 	std::ifstream json_f(file_name);
