@@ -94,6 +94,7 @@ void OnKeyUp(unsigned char key, int x, int y)
 int main(int argc, char* argv[])
 {
 	char file_line_buf[FILE_LINE_BUF_SIZE] = {};
+	std::string file_basename, _;
 	if (argc == 1)
 	{
 		std::cout << "Enter winding diagram configure json file:";
@@ -107,6 +108,8 @@ int main(int argc, char* argv[])
 	p_code = new json();
 	std::ifstream json_f(file_name);
 
+	path_splitext(file_name, file_basename, _);
+
 	json_f >> *p_code;
 	
 	if (p_code->is_object()) { std::cout << "Load file successflly." << std::endl; }
@@ -114,7 +117,7 @@ int main(int argc, char* argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize((*p_code)["size"].get<vector<int>>()[0], (*p_code)["size"].get<vector<int>>()[1]);
-	glutCreateWindow("test");
+	glutCreateWindow(file_basename.c_str());
 	glutDisplayFunc(display);
 	glutKeyboardUpFunc(OnKeyUp);
 	glutShowWindow();

@@ -1,4 +1,5 @@
 #include "winding_diagram_render.h"
+#include <math.h>
 
 int _sign(double x)
 {
@@ -11,6 +12,7 @@ void render_stator(json& code)
 	const int direction =  _sign(slot_range[1] - slot_range[0]);
 	const int slots = abs(slot_range[1] - slot_range[0]) + 1;
 	const int period = code["period"].get<int>();
+	const int s0 = (max(abs(slot_range[0]), abs(slot_range[1])) / period + 1) * period;
 
 	vector<GLdouble> num_offset = {0., 0.};
 	const vector<GLdouble> x_range = {(-1. + static_cast<double>(code["side_margin"].get<double>())/2.0), (1. - static_cast<double>(code["side_margin"].get<double>()) / 2.0) };
@@ -48,7 +50,7 @@ void render_stator(json& code)
 			glColor3d(0.0, 0.0, 0.0);
 			glLineWidth(1);
 
-			draw_string(x - pitch / 2 - direction * w_teeth / 2.0 + num_offset[0], (pos_start[1] + pos_end[1]) / 2.0 + num_offset[1], to_string((i - 1) % period + 1), font = font);
+			draw_string(x - pitch / 2 - direction * w_teeth / 2.0 + num_offset[0], (pos_start[1] + pos_end[1]) / 2.0 + num_offset[1], to_string((i - 1 + s0) % period + 1), font = font);
 			glColor3dv(c_teeth.data());
 			draw_rect(vector<GLdouble>({ x - direction * w_teeth / 2.0, y }).data(), vector<GLdouble>({x + rect_dx - direction * w_teeth / 2.0, y + rect_size_y}).data());
 			
@@ -59,6 +61,10 @@ void render_stator(json& code)
 				if (code.contains("teeth_frame_width"))
 				{
 					glLineWidth(code["teeth_frame_width"].get<double>());
+				}
+				else
+				{
+					glLineWidth(1.);
 				}
 
 				draw_rect(vector<GLdouble>({ x - direction * w_teeth / 2.0, y }).data(), vector<GLdouble>({ x + rect_dx - direction * w_teeth / 2.0, y + rect_size_y }).data(), false);
@@ -121,7 +127,7 @@ void render_winding(json& code)
 		vector<GLdouble> c_coil;
 
 		//Optional Variables
-		if (coil_prop.contains("insert_direction")) { insert_dir = coil_prop["insert_direction"].get<int>(); }
+		if (coil_prop.contains("insert_direction")) { insert_dir = _sign(coil_prop["insert_direction"].get<int>()); }
 		if (coil_prop.contains("coil_x_margin")) { jsonlist2vector(coil_prop["coil_x_margin"], x_margin);/*x_margin = static_cast<vector<GLdouble>>(coil_prop["coil_x_margin"]);*/ }
 		if (coil_prop.contains("coil_y_margin")) { jsonlist2vector(coil_prop["coil_y_margin"], y_margin);/*y_margin = static_cast<vector<GLdouble>>(coil_prop["coil_y_margin"]);*/ }
 		if (coil_prop.contains("jumper_y_margin")) { jsonlist2vector(coil_prop["jumper_y_margin"], y_jumper_margin);/*y_jumper_margin = static_cast<vector<GLdouble>>(coil_prop["jumper_y_margin"]);*/ }
