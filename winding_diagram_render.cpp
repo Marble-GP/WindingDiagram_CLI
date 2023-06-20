@@ -112,11 +112,13 @@ void render_winding(json& code)
 		vector<GLdouble> x_margin = { 0.8 * w_slot };
 		vector<GLdouble> y_margin = { static_cast<GLdouble>(code["div_margin"].get<double>()) / static_cast<GLdouble>(code["divs"].get<double>()) * 3 / 10. };
 		vector<GLdouble> y_jumper_margin = { static_cast<GLdouble>(code["div_margin"].get<double>()) / static_cast<GLdouble>(code["divs"].get<double>()) * 2 / 10, static_cast<GLdouble>(code["div_margin"].get<double>()) / static_cast<GLdouble>(code["divs"].get<double>()) * 4 / 10 };
+		vector<GLdouble> coilside_extention = {0.0, 0.0};
 		GLdouble y_terminal_margin = static_cast<GLdouble>(code["div_margin"].get<double>()) / static_cast<GLdouble>(code["divs"].get<double>()) / 2.0 * 0.2;
 		bool en_jumper = true;
 		bool coil_arrow = true;
 		bool jumper_arrow = false;
 		bool terminal = true;
+		bool multi_turn = true;
 		GLdouble pos_coil_arrow = 0.5;
 		GLdouble pos_jumper_arrow = 0.8;
 		vector<GLdouble> coil_offset = { 0., 0. };
@@ -131,11 +133,13 @@ void render_winding(json& code)
 		if (coil_prop.contains("coil_x_margin")) { jsonlist2vector(coil_prop["coil_x_margin"], x_margin);/*x_margin = static_cast<vector<GLdouble>>(coil_prop["coil_x_margin"]);*/ }
 		if (coil_prop.contains("coil_y_margin")) { jsonlist2vector(coil_prop["coil_y_margin"], y_margin);/*y_margin = static_cast<vector<GLdouble>>(coil_prop["coil_y_margin"]);*/ }
 		if (coil_prop.contains("jumper_y_margin")) { jsonlist2vector(coil_prop["jumper_y_margin"], y_jumper_margin);/*y_jumper_margin = static_cast<vector<GLdouble>>(coil_prop["jumper_y_margin"]);*/ }
+		if (coil_prop.contains("coilside_extention")) { jsonlist2vector(coil_prop["coilside_extention"], coilside_extention); };
 		if (coil_prop.contains("terminal_y_margin")) { y_terminal_margin = static_cast<GLdouble>(coil_prop["terminal_y_margin"].get<double>()); }
 		if (coil_prop.contains("jumper")) { en_jumper = static_cast<bool>(coil_prop["jumper"].get<bool>()); }
 		if (coil_prop.contains("coil_arrow")) { coil_arrow = static_cast<bool>(coil_prop["coil_arrow"].get<bool>()); }
 		if (coil_prop.contains("jumper_arrow")) { jumper_arrow = static_cast<bool>(coil_prop["jumper_arrow"].get<bool>()); }
 		if (coil_prop.contains("terminal")) { terminal = static_cast<bool>(coil_prop["terminal"].get<bool>()); }
+		if (coil_prop.contains("multi_turn")) { multi_turn = static_cast<bool>(coil_prop["multi_turn"].get<bool>()); }
 		if (coil_prop.contains("coil_arrow_position")) { pos_coil_arrow = static_cast<GLdouble>(coil_prop["coil_arrow_position"].get<double>()); }
 		if (coil_prop.contains("jumper_arrow_position")) { pos_jumper_arrow = static_cast<GLdouble>(coil_prop["jumper_arrow_position"].get<double>()); }
 		if (coil_prop.contains("coil_offset")) { jsonlist2vector(coil_prop["coil_offset"], coil_offset);/*coil_offset = static_cast<vector<GLdouble>>(coil_prop["coil_offset"]);*/ }
@@ -164,27 +168,35 @@ void render_winding(json& code)
 			//jumper node
 			x0 = x_range[x_index] + W * (p + p_next - 2 * slot0) / slots / 2.0 * direction + w_slot * direction / 2.0 + w_teeth / 2.0 + coil_offset[0];
 			x1 = x0;
-			y1 = y_range[0] - y_margin[j] * insert_dir + coil_offset[1];
+			y1 = y_range[0] - y_margin[j] * insert_dir + coil_offset[1] - coilside_extention[0];
 			x2 = x_range[x_index] + W * (p - slot0) / slots * direction + x_margin[i] * direction + w_teeth / 2.0 + coil_offset[0];
-			y2 = y_range[0] + coil_offset[1];
+			y2 = y_range[0] + coil_offset[1] - coilside_extention[0];
 			x3 = x2;
-			y3 = y_range[1] + coil_offset[1];
+			y3 = y_range[1] + coil_offset[1] + coilside_extention[1];
 			x4 = x0;
-			y4 = y_range[1] + y_margin[j] * insert_dir + coil_offset[1];
+			y4 = y_range[1] + y_margin[j] * insert_dir + coil_offset[1] + coilside_extention[1];
 			x5 = x_range[x_index] + W * (p_next - slot0) / slots * direction + w_slot * direction - x_margin[i] * direction + w_teeth / 2.0 + coil_offset[0];
-			y5 = y_range[1] + coil_offset[1];
+			y5 = y_range[1] + coil_offset[1] + coilside_extention[1];
 			x6 = x5;
-			y6 = y_range[0] + coil_offset[1];
+			y6 = y_range[0] + coil_offset[1] - coilside_extention[0];
 			x7 = x0;
 			y7 = y1;
 
-			v_coil_path.emplace_back(vector<GLdouble>({ x1, y1 }));
+			if (multi_turn)
+			{
+				v_coil_path.emplace_back(vector<GLdouble>({ x1, y1 }));
+			}
+
 			v_coil_path.emplace_back(vector<GLdouble>({ x2, y2 }));
 			v_coil_path.emplace_back(vector<GLdouble>({ x3, y3 }));
 			v_coil_path.emplace_back(vector<GLdouble>({ x4, y4 }));
 			v_coil_path.emplace_back(vector<GLdouble>({ x5, y5 }));
 			v_coil_path.emplace_back(vector<GLdouble>({ x6, y6 }));
-			v_coil_path.emplace_back(vector<GLdouble>({ x7, y7 }));
+
+			if (multi_turn)
+			{
+				v_coil_path.emplace_back(vector<GLdouble>({ x7, y7 }));
+			}
 
 
 			if (coil_prop.contains("coil_width")) { glLineWidth(static_cast<GLdouble>(coil_prop["coil_width"].get<double>())); }
@@ -237,7 +249,14 @@ void render_winding(json& code)
 			draw_arrow(v_arrow_path_1, v_arrow_path_2, 1.0, 0.01);
 
 			draw_string(x_start + label_offset[0], y_L_start + label_offset[1], label, font);
-			draw_string(x_end + label_offset[0], y_L_start + label_offset[1], label + "\'", font);
+			if (coil_prop.contains("endpoint_label"))
+			{
+				draw_string(x_end + label_offset[0], y_L_start + label_offset[1], coil_prop["endpoint_label"].get<string>(), font);
+			}
+			else
+			{
+				draw_string(x_end + label_offset[0], y_L_start + label_offset[1], label + "\'", font);
+			}
 		}
 
 

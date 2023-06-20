@@ -7,7 +7,7 @@
  * @date   June 2023
  * 
  * @lisence MIT (only these codes. You must comply with the license set for each external library you reference.)
- * @version 0.1
+ * @version 0.2
  *  
  *********************************************************************/
 
@@ -93,36 +93,39 @@ void OnKeyUp(unsigned char key, int x, int y)
 
 int main(int argc, char* argv[])
 {
-	char file_line_buf[FILE_LINE_BUF_SIZE] = {};
-	std::string file_basename, _;
-	if (argc == 1)
+	while (true)
 	{
-		std::cout << "Enter winding diagram configure json file:";
-		std::cin >> file_name;
+		char file_line_buf[FILE_LINE_BUF_SIZE] = {};
+		std::string file_basename, _;
+		if (argc == 1)
+		{
+			std::cout << "Enter winding diagram configure json file:";
+			std::cin >> file_name;
+		}
+		else if (argc == 2)
+		{
+			file_name = argv[1];
+		}
+
+		p_code = new json();
+		std::ifstream json_f(file_name);
+
+		path_splitext(file_name, file_basename, _);
+
+		json_f >> *p_code;
+
+		if (p_code->is_object()) { std::cout << "Load file successflly." << std::endl; }
+
+		glutInit(&argc, argv);
+		glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+		glutInitWindowSize((*p_code)["size"].get<vector<int>>()[0], (*p_code)["size"].get<vector<int>>()[1]);
+		glutCreateWindow(file_basename.c_str());
+		glutDisplayFunc(display);
+		glutKeyboardUpFunc(OnKeyUp);
+		glutShowWindow();
+		glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+		glutMainLoop();
 	}
-	else if (argc == 2)
-	{
-		file_name = argv[1];
-	}
-
-	p_code = new json();
-	std::ifstream json_f(file_name);
-
-	path_splitext(file_name, file_basename, _);
-
-	json_f >> *p_code;
-	
-	if (p_code->is_object()) { std::cout << "Load file successflly." << std::endl; }
-
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowSize((*p_code)["size"].get<vector<int>>()[0], (*p_code)["size"].get<vector<int>>()[1]);
-	glutCreateWindow(file_basename.c_str());
-	glutDisplayFunc(display);
-	glutKeyboardUpFunc(OnKeyUp);
-	glutShowWindow();
-	glutMainLoop();
-
 
 	return 0;
 }
