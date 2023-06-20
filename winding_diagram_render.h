@@ -6,7 +6,7 @@
  * @date   June 2023
  * 
  * @license MIT (only these codes. You must comply with the license set for each external library you reference.)
- * @version 0.2
+ * @version 0.2.1
  * 
  *********************************************************************/
 
