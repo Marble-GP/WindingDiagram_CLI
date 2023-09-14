@@ -115,7 +115,7 @@ void render_winding(json& code)
 		vector<GLdouble> coilside_extention = {0.0, 0.0};
 		vector<GLdouble> coil_width = { 1.0 };
 		vector<GLdouble> jumper_width = { 1.0 };
-		vector<GLdouble> arrow_width = { 1.0 };
+		GLdouble terminal_width = 1.0;
 		GLdouble y_terminal_margin = static_cast<GLdouble>(code["div_margin"].get<double>()) / static_cast<GLdouble>(code["divs"].get<double>()) / 2.0 * 0.2;
 		bool en_jumper = true;
 		bool coil_arrow = true;
@@ -147,7 +147,7 @@ void render_winding(json& code)
 		if (coil_prop.contains("font")) { font_addr_num = GLUT_FONT_TABLE[static_cast<string>(coil_prop["font"].get<string>())]; font = reinterpret_cast<void*>(font_addr_num); }
 		if (coil_prop.contains("coil_width")) { if (coil_prop["coil_width"].is_array()) { jsonlist2vector(coil_prop["coil_width"], coil_width); } else if (coil_prop["coil_width"].is_number()) {coil_width[0] = static_cast<GLdouble>(coil_prop["coil_width"].get<double>());} }
 		if (coil_prop.contains("jumper_width")) { if (coil_prop["jumper_width"].is_array()) { jsonlist2vector(coil_prop["jumper_width"], jumper_width); } else if (coil_prop["jumper_width"].is_number()) { jumper_width[0] = static_cast<GLdouble>(coil_prop["jumper_width"].get<double>()); } }
-		if (coil_prop.contains("arrow_width")) { if (coil_prop["arrow_width"].is_array()) { jsonlist2vector(coil_prop["arrow_width"], arrow_width); } else if (coil_prop["arrow_width"].is_number()) { arrow_width[0] = static_cast<GLdouble>(coil_prop["arrow_width"].get<double>()); } }
+		if (coil_prop.contains("terminal_width")) { if (coil_prop["terminal_width"].is_array()){ terminal_width = static_cast<GLdouble>(coil_prop["terminal_width"].get<double>()); } }
 
 		color_name2RGB(static_cast<string>(coil_prop["color"].get<string>()), c_coil);
 		glColor3dv(c_coil.data());
@@ -244,7 +244,7 @@ void render_winding(json& code)
 
 			v_arrow_path_1[0] = x_start; v_arrow_path_1[1] = y_L_start; v_arrow_path_2[0] = x_start; v_arrow_path_2[1] = y_H_start;
 			
-			if (coil_prop.contains("arrow_width")) { glLineWidth(arrow_width[k]); }
+			if (coil_prop.contains("terminal_width")) { glLineWidth(terminal_width); }
 			else { glLineWidth(1.); }
 			
 			draw_arrow(v_arrow_path_1, v_arrow_path_2, 1.0, 0.01);
