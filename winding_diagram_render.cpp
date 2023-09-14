@@ -252,7 +252,6 @@ void render_winding(json& code)
 			draw_arrow(v_arrow_path_1, v_arrow_path_2, 1.0, 0.01);
 
 			draw_string(x_start + label_offset[0], y_L_start + label_offset[1], label, font);
-			draw_string(x_end + label_offset[0], y_L_start + label_offset[1], label + "\'", font);
 		
 			
 			if (coil_prop.contains("endpoint_label"))
